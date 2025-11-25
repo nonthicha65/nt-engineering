@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบจัดการข้อมูล กองช่าง NT</title>
+<link rel="stylesheet" href="css/style.css">
+
+</head>
+<body>
+    <!-- Header -->
+    <header class="top-header">
+        <div class="header-left">
+            <div class="nt-logo">NT</div>
+            <h1>ชื่อ-สกุล</h1>
+        </div>
+        <div class="header-right">
+            <select id="locationFilter" class="location-select">
+                <option value="">เลือกสถานที่</option>
+                <option value="LPN1">LPN1 - ลำพูน 1</option>
+                <option value="MAKC">MAKC - มะเขือแจ้</option>
+                <option value="UMG">UMG - อุโมงค์</option>
+                <option value="NUL">NUL - นิคมอุตสาหกรรมลำพูน</option>
+                <option value="LPN2">LPN2 - ลำพูน 2</option>
+            </select>
+            <button id="logoutBtn" class="btn-logout">ออกจากระบบ</button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <nav class="menu">
+                <button class="menu-item active" data-menu="battery">🔋 แบตเตอร์รี่</button>
+                <button class="menu-item" data-menu="solar">☀️ โซล่าเซลล์</button>
+                <button class="menu-item" data-menu="aircon">❄️ เครื่องแอร์</button>
+                <button class="menu-item" data-menu="transformer">⚡ หม้อแปลง</button>
+                <button class="menu-item" data-menu="gps">📍 GPS</button>
+            
+            </nav>
+        </aside>
+
+        <!-- Content Area -->
+        <main class="content-area">
+            <!-- Location Summary Card -->
+            <div id="locationSummary" class="location-summary" style="display: none;">
+                <h2 class="summary-title">ข้อมูลสรุป: <span id="selectedLocationName"></span></h2>
+                <div class="summary-grid">
+                    <div class="summary-card">
+                        <div class="card-icon">🔋</div>
+                        <div class="card-info">
+                            <h3>แบตเตอร์รี่</h3>
+                            <p class="card-number" id="batteryCount">0</p>
+                            <p class="card-label">รายการ</p>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="card-icon">☀️</div>
+                        <div class="card-info">
+                            <h3>โซล่าเซลล์</h3>
+                            <p class="card-number" id="solarCount">0</p>
+                            <p class="card-label">รายการ</p>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="card-icon">❄️</div>
+                        <div class="card-info">
+                            <h3>เครื่องแอร์</h3>
+                            <p class="card-number" id="airconCount">0</p>
+                            <p class="card-label">รายการ</p>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="card-icon">⚡</div>
+                        <div class="card-info">
+                            <h3>หม้อแปลง</h3>
+                            <p class="card-number" id="transformerCount">0</p>
+                            <p class="card-label">รายการ</p>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="card-icon">📍</div>
+                        <div class="card-info">
+                            <h3>GPS</h3>
+                            <p class="card-number" id="gpsCount">0</p>
+                            <p class="card-label">รายการ</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="summary-note">
+                    <p>💡 กรุณาเลือกเมนูด้านซ้ายเพื่อดูรายละเอียดแต่ละหมวด</p>
+                </div>
+            </div>
+
+            <!-- Table Header -->
+            <div class="table-header">
+                <h2 class="table-title">บ.ย.ม.</h2>
+                <div class="search-filter">
+                    <select id="searchField" class="search-select">
+                        <option value="">ค้นหาจาก...</option>
+                        <option value="code10">รหัสสินทรัพย์/รหัส10หลัก</option>
+                        <option value="shortName">รหัสชุมสาย</option>
+                    </select>
+                    <input type="text" id="searchInput" class="search-input" placeholder="พิมพ์คำค้นหา...">
+                    <button class="btn-search" id="searchBtn">🔍 ค้นหา</button>
+                    <button class="btn-clear" id="clearBtn">✕ ล้าง</button>
+                </div>
+                <div class="table-actions">
+                    <button class="btn-add" id="addNewBtn">+ เพิ่มข้อมูล</button>
+                    <button class="btn-excel" id="importExcel">📥 นำเข้า Excel</button>
+                    <button class="btn-excel" id="exportExcel">📤 ส่งออก Excel</button>
+                </div>
+            </div>
+
+            <!-- Data Grid -->
+            <div class="data-grid-container">
+                <table class="data-grid">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">ลำดับ</th>
+                            <th style="width: 120px;">รหัส10หลัก</th>
+                            <th style="width: 150px;">ภาคขายและบริการ</th>
+                            <th style="width: 100px;">ชื่อย่อสถานที่</th>
+                            <th style="width: 200px;">ชื่อสถานที่(ไทย)</th>
+                            <th style="width: 200px;">ชื่อสถานที่(อังกฤษ)</th>
+                            <th style="width: 120px;">ชื่อบริษัท</th>
+                            <th style="width: 100px;">สถานะ</th>
+                            <th style="width: 100px;">Homing</th>
+                            <th style="width: 180px;">ศูนย์บริการลูกค้า</th>
+                            <th style="width: 100px;">Rank</th>
+                            <th style="width: 120px;">ขนาดเลขหมาย</th>
+                            <th style="width: 150px;">โครงการ</th>
+                            <th style="width: 150px;">รหัสสถานีฐาน</th>
+                            <th style="width: 100px;">บริษัท</th>
+                            <th style="width: 150px;">SITE_NAME</th>
+                            <th style="width: 120px;">SITE_LAT</th>
+                            <th style="width: 120px;">SITE_LONG</th>
+                            <th style="width: 120px;">SITE_TYPE</th>
+                            <th style="width: 150px;">SITE_EQUIPMENT</th>
+                            <th style="width: 120px;">SITE_OWNER</th>
+                            <th style="width: 150px;">สถานที่ติดตั้ง</th>
+                            <th style="width: 150px;">เลขที่</th>
+                            <th style="width: 100px;">หมู่ที่</th>
+                            <th style="width: 100px;">ซอย</th>
+                            <th style="width: 150px;">ถนน</th>
+                            <th style="width: 150px;">หมู่บ้าน</th>
+                            <th style="width: 150px;">แขวง/ตำบล</th>
+                            <th style="width: 150px;">เขต/อำเภอ</th>
+                            <th style="width: 120px;">จังหวัด</th>
+                            <th style="width: 100px;">รหัสไปรษณีย์</th>
+                            <th style="width: 120px;">Lat</th>
+                            <th style="width: 120px;">Long</th>
+                            <th style="width: 150px;">ส่วนงานผู้ขอรหัส</th>
+                            <th style="width: 120px;">วันที่อนุมัติ</th>
+                            <th style="width: 120px;">ผู้จัดทำ</th>
+                            <th style="width: 200px;">หมายเหตุ</th>
+                            <th style="width: 120px;">จัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dataGridBody">
+                        <tr>
+                            <td colspan="38" class="loading-cell">กรุณาเลือกสถานที่...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal สำหรับเพิ่ม/แก้ไขข้อมูล -->
+    <div id="dataModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modalTitle">เพิ่มข้อมูลใหม่</h2>
+            <form id="dataForm">
+                <input type="hidden" id="dataId">
+                
+                <div class="form-group">
+                    <label>ลำดับ:</label>
+                    <input type="text" id="orderNo" required>
+                </div>
+
+                <div class="form-group">
+                    <label>รหัส10หลัก:</label>
+                    <input type="text" id="code10" required>
+                </div>
+
+                <div class="form-group">
+                    <label>ภาคขายและบริการ:</label>
+                    <input type="text" id="region" required>
+                </div>
+
+                <div class="form-group">
+                    <label>ชื่อย่อสถานที่:</label>
+                    <input type="text" id="shortName" required>
+                </div>
+
+                <div class="form-group">
+                    <label>ชื่อสถานที่ (ไทย):</label>
+                    <input type="text" id="nameThai" required>
+                </div>
+
+                <div class="form-group">
+                    <label>ชื่อสถานที่ (อังกฤษ):</label>
+                    <input type="text" id="nameEnglish">
+                </div>
+
+                <div class="form-group">
+                    <label>ชื่อบริษัท:</label>
+                    <input type="text" id="company">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>สถานะ:</label>
+                        <input type="text" id="status">
+                    </div>
+                    <div class="form-group">
+                        <label>Homing:</label>
+                        <input type="text" id="homing">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>ศูนย์บริการลูกค้า:</label>
+                    <input type="text" id="serviceCenter">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Rank:</label>
+                        <input type="text" id="rank">
+                    </div>
+                    <div class="form-group">
+                        <label>ขนาดเลขหมาย:</label>
+                        <input type="text" id="numberSize">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>โครงการ:</label>
+                        <input type="text" id="project">
+                    </div>
+                    <div class="form-group">
+                        <label>รหัสสถานีฐาน:</label>
+                        <input type="text" id="baseStationCode">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>SITE_NAME:</label>
+                    <input type="text" id="siteName">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>SITE_LAT:</label>
+                        <input type="text" id="siteLat">
+                    </div>
+                    <div class="form-group">
+                        <label>SITE_LONG:</label>
+                        <input type="text" id="siteLong">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>SITE_TYPE:</label>
+                        <input type="text" id="siteType">
+                    </div>
+                    <div class="form-group">
+                        <label>SITE_EQUIPMENT:</label>
+                        <input type="text" id="siteEquipment">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>SITE_OWNER:</label>
+                    <input type="text" id="siteOwner">
+                </div>
+
+                <div class="form-group">
+                    <label>สถานที่ติดตั้ง:</label>
+                    <input type="text" id="installLocation">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>เลขที่:</label>
+                        <input type="text" id="addressNo">
+                    </div>
+                    <div class="form-group">
+                        <label>หมู่ที่:</label>
+                        <input type="text" id="moo">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>ซอย:</label>
+                        <input type="text" id="soi">
+                    </div>
+                    <div class="form-group">
+                        <label>ถนน:</label>
+                        <input type="text" id="road">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>หมู่บ้าน:</label>
+                    <input type="text" id="village">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>แขวง/ตำบล:</label>
+                        <input type="text" id="subdistrict">
+                    </div>
+                    <div class="form-group">
+                        <label>เขต/อำเภอ:</label>
+                        <input type="text" id="district">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>จังหวัด:</label>
+                        <input type="text" id="province">
+                    </div>
+                    <div class="form-group">
+                        <label>รหัสไปรษณีย์:</label>
+                        <input type="text" id="zipcode">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Latitude:</label>
+                        <input type="text" id="latitude">
+                    </div>
+                    <div class="form-group">
+                        <label>Longitude:</label>
+                        <input type="text" id="longitude">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>ส่วนงานผู้ขอรหัส:</label>
+                    <input type="text" id="requester">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>วันที่อนุมัติ:</label>
+                        <input type="date" id="approvalDate">
+                    </div>
+                    <div class="form-group">
+                        <label>ผู้จัดทำ:</label>
+                        <input type="text" id="creator">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>หมายเหตุ:</label>
+                    <textarea id="remark" rows="3"></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">💾 บันทึก</button>
+                    <button type="button" class="btn-secondary" onclick="closeModal()">ยกเลิก</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Excel Import Input -->
+    <input type="file" id="excelFileInput" accept=".xlsx, .xls" style="display: none;">
+
+    <!-- JavaScript -->
+    <script src="js/main.js"></script>
+
+</body>
+</html>
