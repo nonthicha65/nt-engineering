@@ -1,5 +1,5 @@
 /* ========================================
-   index01.css - ระบบจัดการข้อมูล กองช่าง NT
+   index.css - ระบบจัดการข้อมูล กองช่าง NT
    ======================================== */
 
 * {
@@ -10,14 +10,14 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f5f5f5;
+    background-color: #fffbe7;
 }
 
 /* Header Styles */
 .top-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 15px 30px;
+    background: linear-gradient(135deg, #ffffff 0%, #bb870c 100%);
+    color: rgb(0, 0, 0) ;
+    padding: 10px 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -29,51 +29,73 @@ body {
     align-items: center;
     gap: 15px;
 }
-
+/*โลโก้*/
 .nt-logo {
-    width: 50px;
-    height: 50px;
-    background-color: white;
-    color: #667eea;
-    border-radius: 50%;
+    width: 110px;                       /* ขนาดโลโก้ */
+    height: 110px;
+     background-image: url("nt-logo.png"); /* <<< รูปโลโก้ */
+    background-size: 100%;     /* ปรับเปอร์เซ็นต์ได้ */
+    background-repeat: no-repeat;
+    background-position: center;       /* จัดกลางสวย */
+
+    filter: drop-shadow(0 4px 20px rgba(0,0,0,0.35))
+            /*drop-shadow(0 0 10px rgba(255,193,7,0.5)); /* เงาที่ติดกับโลโก้ */
+}
+
+
+
+/*ขนาดชื่อ-สกุล*/
+.header-left {
     display: flex;
     align-items: center;
+    gap: 15px;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
     justify-content: center;
-    font-weight: bold;
-    font-size: 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
 
 .header-left h1 {
-    font-size: 20px;
+    font-size: 30px;
     font-weight: 500;
+    margin: 0;
+    line-height: 1.2;
 }
+
+.header-left .position {
+    font-size: 18px;      /* ตัวอักษรเล็กกว่า */
+    color: #444;          /* สีอ่อนลงเพื่อความสบายตา */
+    margin-top: 3px 0 0 0;      /* เว้นระยะเล็กน้อย */
+}
+
 
 .header-right {
     display: flex;
     align-items: center;
     gap: 15px;
 }
-
+/*ดรอปดาวน์เลือกสถานที่*/
 .location-select {
     padding: 8px 15px;
-    border: 2px solid white;
+    border: 2px solid rgb(0, 0, 0);
     border-radius: 20px;
-    background: rgba(255,255,255,0.2);
-    color: white;
+    background: rgba(255, 255, 255, 0.8);
+    color: rgb(0, 0, 0);
     font-size: 14px;
     cursor: pointer;
     transition: all 0.3s;
 }
 
 .location-select:hover {
-    background: rgba(255,255,255,0.3);
+    background: rgba(255, 255, 255, 0.41);
 }
 
 .location-select option {
     color: #333;
 }
-
+/*logout ปุ่ม*/
 .btn-logout {
     padding: 8px 20px;
     background-color: white;
